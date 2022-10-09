@@ -12,7 +12,7 @@ Dancer  =>(7 ,20 ,119))
 
 #[derive(Debug)]
 pub struct Reindeer {
-    name: &'static str,
+    _name: &'static str,
     speed: usize,
     speed_time: usize,
     rest: usize,
@@ -36,7 +36,7 @@ macro_rules! reindeer {
         [$(
 
             Reindeer {
-                name : $name,
+                _name : $name,
                 speed   : $speed,
                 speed_time :  $speed_time,
                 rest: $rest,

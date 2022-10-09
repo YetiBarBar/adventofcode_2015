@@ -34,7 +34,7 @@ fn repartitions(max: isize, amount: isize) -> Vec<Vec<isize>> {
         return vec![vec![max]];
     }
 
-    (0..max + 1)
+    (0..=max)
         .flat_map(|x| {
             let mut retval = repartitions(max - x, amount - 1);
 
