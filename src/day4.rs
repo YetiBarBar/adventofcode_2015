@@ -1,5 +1,4 @@
 use adventofcode_tooling::AocError;
-use md5;
 
 #[must_use]
 pub fn process(data: &str, goal: &str, start: usize) -> usize {

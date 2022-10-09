@@ -21,7 +21,25 @@ pub fn main() {
                     .sum::<usize>()
         })
         .sum::<usize>();
-    println!("{}", res);
+    println!("Part 1: {}", res);
+
+    let res2 = data
+        .lines()
+        .map(|line| encode_size(line) - line.len())
+        .sum::<usize>();
+    println!("Part 2: {}", res2);
+}
+
+fn encode_size(input: &str) -> usize {
+    // Only '\' char and '"' increase size
+    // + 2 for start and end ""
+    2 + input
+        .chars()
+        .map(|chr| match chr {
+            '\\' | '"' => 2,
+            _ => 1,
+        })
+        .sum::<usize>()
 }
 
 enum EscapingStatus {
