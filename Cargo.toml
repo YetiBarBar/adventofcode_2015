@@ -41,6 +41,10 @@ path = "src/day8.rs"
 name = "day10"
 path = "src/day10.rs"
 
+[[bin]]
+name = "day11"
+path = "src/day11.rs"
+
 [dependencies]
 thiserror = "1.0.30"
 bytecount = "0.6.2"
