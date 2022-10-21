@@ -70,3 +70,4 @@ thiserror = "1.0.30"
 bytecount = "0.6.2"
 md5 = "0.7"
 adventofcode-tooling = { path = "../adventofcode-tooling/"}
+nom = "7.1"
