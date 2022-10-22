@@ -38,6 +38,10 @@ name = "day8"
 path = "src/day8.rs"
 
 [[bin]]
+name = "day9"
+path = "src/day9.rs"
+
+[[bin]]
 name = "day10"
 path = "src/day10.rs"
 
@@ -71,3 +75,4 @@ bytecount = "0.6.2"
 md5 = "0.7"
 adventofcode-tooling = { path = "../adventofcode-tooling/"}
 nom = "7.1"
+itertools = "0.10.5"
