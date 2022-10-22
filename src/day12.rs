@@ -1,24 +1,38 @@
+use serde_json::Value;
+
 fn main() {
-    let input = include_str!("../data/day12_json_pp.data");
+    let input = include_str!("../data/day12.data");
 
-    let valid_char: String = input
-        .chars()
-        .filter(|c| c.is_digit(10) || c == &'-' || c == &'\n')
-        .collect();
+    let json_object: serde_json::Value = serde_json::from_str(input).unwrap();
 
-    print!("{}", valid_char);
-    let res1 = valid_char
-        .lines()
-        .filter(|line| !line.is_empty())
-        .filter_map(|line| {
-            let cleaned: String = line
-                .chars()
-                .filter(|c| c.is_digit(10) || c == &'-')
-                .collect();
-            println!("{}", cleaned);
-            cleaned.parse::<isize>().ok()
-        })
-        .sum::<isize>();
+    let res_step1 = evaluate_node(&json_object, 1);
+    println!("Part 1: {}", res_step1);
+    let res_step2 = evaluate_node(&json_object, 2);
+    println!("Part 2: {}", res_step2);
+}
 
-    println!("Part 1: {}", res1);
+fn evaluate_node(value: &Value, step: usize) -> i64 {
+    match value {
+        Value::Number(n) => n.as_i64().unwrap(),
+        Value::Array(items) => items.iter().map(|item| evaluate_node(item, step)).sum(),
+        Value::Object(objects) => {
+            if step == 2
+                && objects.iter().any(|obj| {
+                    if let Value::String(s) = obj.1 {
+                        s == "red"
+                    } else {
+                        false
+                    }
+                })
+            {
+                0
+            } else {
+                objects
+                    .iter()
+                    .map(|(_, value)| evaluate_node(value, step))
+                    .sum()
+            }
+        }
+        _ => 0,
+    }
 }
