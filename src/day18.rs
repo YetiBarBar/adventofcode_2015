@@ -13,13 +13,21 @@ impl<const N: usize> Matrix<N> {
     fn get_x_y(&self, x: isize, y: isize) -> bool {
         *self
             .values
-            .get(y as usize)
+            .get(usize::try_from(y).unwrap())
             .unwrap()
-            .get(x as usize)
+            .get(usize::try_from(x).unwrap())
             .unwrap()
     }
 
-    fn get_neighboorhood(&self, x: isize, y: isize) -> Vec<bool> {
+    /// Retrieve neighboorhood
+    ///
+    /// # Panics
+    ///
+    /// If cannot convert usize to isize
+    fn get_neighboorhood(&self, x: usize, y: usize) -> Vec<bool> {
+        let x = isize::try_from(x).unwrap();
+        let y = isize::try_from(y).unwrap();
+        let n: isize = isize::try_from(N).unwrap();
         [
             (-1, -1),
             (-1, 0),
@@ -31,15 +39,13 @@ impl<const N: usize> Matrix<N> {
             (1, 1),
         ]
         .iter()
-        .filter(|(dx, dy)| {
-            x + *dx >= 0 && y + *dy >= 0 && x + *dx < N as isize && y + *dy < N as isize
-        })
+        .filter(|(dx, dy)| x + *dx >= 0 && y + *dy >= 0 && x + *dx < n && y + *dy < n)
         .map(|(dx, dy)| (x + dx, y + dy))
         .map(|(pos_x, pos_y)| self.get_x_y(pos_x, pos_y))
         .collect()
     }
 
-    fn count_sharp_neighboors(&self, x: isize, y: isize) -> usize {
+    fn count_sharp_neighboors(&self, x: usize, y: usize) -> usize {
         let neighb = self.get_neighboorhood(x, y);
         let res = neighb.iter().filter(|v| **v).count();
 
@@ -66,14 +72,13 @@ fn main() {
 
     for _ in 0..100 {
         let mut new_matrix = [[false; 100]; 100];
-        for y in 0_isize..100 {
-            for x in 0_isize..100 {
-                let current = matrix.values[y as usize][x as usize];
+        for (y, line) in matrix.values.iter().enumerate() {
+            for (x, current) in line.iter().enumerate() {
                 let ctr = matrix.count_sharp_neighboors(x, y);
-                if current {
-                    new_matrix[y as usize][x as usize] = ctr == 2 || ctr == 3;
+                if *current {
+                    new_matrix[y][x] = ctr == 2 || ctr == 3;
                 } else {
-                    new_matrix[y as usize][x as usize] = ctr == 3;
+                    new_matrix[y][x] = ctr == 3;
                 }
             }
         }
@@ -96,14 +101,13 @@ fn main() {
     matrix2.values[99][99] = true;
     for _ in 0..100 {
         let mut new_matrix = [[false; 100]; 100];
-        for y in 0_isize..100 {
-            for x in 0_isize..100 {
-                let current = matrix2.values[y as usize][x as usize];
+        for (y, line) in matrix2.values.iter().enumerate() {
+            for (x, current) in line.iter().enumerate() {
                 let ctr = matrix2.count_sharp_neighboors(x, y);
-                if current {
-                    new_matrix[y as usize][x as usize] = ctr == 2 || ctr == 3;
+                if *current {
+                    new_matrix[y][x] = ctr == 2 || ctr == 3;
                 } else {
-                    new_matrix[y as usize][x as usize] = ctr == 3;
+                    new_matrix[y][x] = ctr == 3;
                 }
             }
         }

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+#[must_use]
 pub fn house_n(n: usize) -> usize {
     (1..=n).map(|x| if n % x == 0 { x * 10 } else { 0 }).sum()
 }
