@@ -9,6 +9,11 @@ fn main() {
     let calibrated = calibrate(&medicine, &world_map);
 
     println!("Part 1: {}", calibrated.len());
+
+    let rn = medicine.iter().filter(|med| med == &"Rn").count();
+    let ar = medicine.iter().filter(|med| med == &"Ar").count();
+    let y = medicine.iter().filter(|med| med == &"Y").count();
+    println!("Part 2: {}", medicine.len() - rn - ar - 2 * y - 1);
 }
 
 fn calibrate(medicine: &[String], world_map: &HashMap<String, Vec<String>>) -> HashSet<String> {
