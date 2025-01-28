@@ -3,22 +3,26 @@ use std::collections::HashMap;
 use itertools::Itertools;
 use nom::bytes::complete::tag;
 use nom::sequence::separated_pair;
+use nom::AsChar;
 use nom::{
-    character::{is_alphabetic, is_digit},
     combinator::{map, map_res},
-    IResult,
+    IResult, Parser,
 };
 
 fn parse_string(data: &[u8]) -> IResult<&[u8], String> {
-    map(nom::bytes::complete::take_while1(is_alphabetic), |bytes| {
-        String::from_utf8_lossy(bytes).to_string()
-    })(data)
+    map(
+        nom::bytes::complete::take_while1(AsChar::is_alpha),
+        |bytes| String::from_utf8_lossy(bytes).to_string(),
+    )
+    .parse(data)
 }
 
 fn parse_int(data: &[u8]) -> IResult<&[u8], usize> {
-    map_res(nom::bytes::complete::take_while1(is_digit), |bytes| {
-        String::from_utf8_lossy(bytes).parse::<usize>()
-    })(data)
+    map_res(
+        nom::bytes::complete::take_while1(AsChar::is_dec_digit),
+        |bytes| String::from_utf8_lossy(bytes).parse::<usize>(),
+    )
+    .parse(data)
 }
 
 fn parse_line(data: &str) -> ((String, String), usize) {
@@ -26,7 +30,8 @@ fn parse_line(data: &str) -> ((String, String), usize) {
         separated_pair(parse_string, tag(" to "), parse_string),
         tag(" = "),
         parse_int,
-    )(data.as_bytes())
+    )
+    .parse(data.as_bytes())
     .unwrap()
     .1
 }

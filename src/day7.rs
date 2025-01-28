@@ -1,10 +1,10 @@
 use nom::bytes::complete::tag;
 use nom::sequence::{preceded, separated_pair};
+use nom::AsChar;
 use nom::{
     branch::alt,
-    character::{is_alphabetic, is_digit},
     combinator::{map, map_res},
-    IResult,
+    IResult, Parser,
 };
 use std::collections::HashMap;
 use std::ops::Not;
@@ -57,45 +57,54 @@ impl Gate {
 
 fn parse_value(data: &[u8]) -> IResult<&[u8], Value> {
     alt((
-        map_res(nom::bytes::complete::take_while1(is_digit), |bytes| {
-            String::from_utf8_lossy(bytes)
-                .parse::<u16>()
-                .map(Value::Int)
-        }),
-        map(nom::bytes::complete::take_while1(is_alphabetic), |bytes| {
-            Value::Reg(String::from_utf8_lossy(bytes).to_string())
-        }),
-    ))(data)
+        map_res(
+            nom::bytes::complete::take_while1(AsChar::is_dec_digit),
+            |bytes| {
+                String::from_utf8_lossy(bytes)
+                    .parse::<u16>()
+                    .map(Value::Int)
+            },
+        ),
+        map(
+            nom::bytes::complete::take_while1(AsChar::is_alpha),
+            |bytes| Value::Reg(String::from_utf8_lossy(bytes).to_string()),
+        ),
+    ))
+    .parse(data)
 }
 
 fn parse_not(data: &[u8]) -> IResult<&[u8], Gate> {
-    map(preceded(tag(b"NOT "), parse_value), Gate::Not)(data)
+    map(preceded(tag(b"NOT ".as_slice()), parse_value), Gate::Not).parse(data)
 }
 
 fn parse_or(data: &[u8]) -> IResult<&[u8], Gate> {
     map(
         separated_pair(parse_value, tag(" OR "), parse_value),
         |(v1, v2)| Gate::Or(v1, v2),
-    )(data)
+    )
+    .parse(data)
 }
 
 fn parse_and(data: &[u8]) -> IResult<&[u8], Gate> {
     map(
         separated_pair(parse_value, tag(" AND "), parse_value),
         |(v1, v2)| Gate::And(v1, v2),
-    )(data)
+    )
+    .parse(data)
 }
 fn parse_lshift(data: &[u8]) -> IResult<&[u8], Gate> {
     map(
         separated_pair(parse_value, tag(" LSHIFT "), parse_value),
         |(v1, v2)| Gate::Lshift(v1, v2),
-    )(data)
+    )
+    .parse(data)
 }
 fn parse_rshift(data: &[u8]) -> IResult<&[u8], Gate> {
     map(
         separated_pair(parse_value, tag(" RSHIFT "), parse_value),
         |(v1, v2)| Gate::Rshift(v1, v2),
-    )(data)
+    )
+    .parse(data)
 }
 fn parse_gate(data: &[u8]) -> IResult<&[u8], Gate> {
     alt((
@@ -105,21 +114,24 @@ fn parse_gate(data: &[u8]) -> IResult<&[u8], Gate> {
         parse_lshift,
         parse_rshift,
         parse_fixed,
-    ))(data)
+    ))
+    .parse(data)
 }
 
 fn parse_fixed(data: &[u8]) -> IResult<&[u8], Gate> {
-    map(parse_value, Gate::Fixed)(data)
+    map(parse_value, Gate::Fixed).parse(data)
 }
 
 fn parse_rule(data: &[u8]) -> IResult<&[u8], (Gate, String)> {
     separated_pair(
         parse_gate,
         tag(" -> "),
-        map(nom::bytes::complete::take_while1(is_alphabetic), |bytes| {
-            String::from_utf8_lossy(bytes).to_string()
-        }),
-    )(data)
+        map(
+            nom::bytes::complete::take_while1(AsChar::is_alpha),
+            |bytes| String::from_utf8_lossy(bytes).to_string(),
+        ),
+    )
+    .parse(data)
 }
 
 fn main() {

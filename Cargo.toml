@@ -106,10 +106,10 @@ name = "day25"
 path = "src/day25.rs"
 
 [dependencies]
-thiserror = "1.0.30"
+thiserror = "2"
 bytecount = "0.6.2"
 md5 = "0.7"
-adventofcode-tooling = { path = "../adventofcode-tooling/"}
-nom = "7.1"
-itertools = "0.10.5"
-serde_json= "1"
+adventofcode-tooling = { path = "../adventofcode-tooling/" }
+nom = "8"
+itertools = "0.14"
+serde_json = "1"
